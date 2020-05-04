@@ -52,7 +52,7 @@ run_analysis <- function(){
   # Now the averages of each column within the grouping of subject, activity needs to be calculated.
   averaged <- all_df %>% group_by(subject, activity_type) %>% summarise_all(mean)
   
-  write.csv(averaged, file='./r_data/r_class/assignment4/tidy_dataset.csv')
+  write.table(test2, file='./r_data/r_class/assignment4/tidy_dataset.csv', row.names = FALSE)
   
   return(averaged)
   
