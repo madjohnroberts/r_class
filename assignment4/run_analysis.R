@@ -1,18 +1,24 @@
 run_analysis <- function(){
+  # Reads the test and train data from the UCI HAR dataset. The test and training values are 
+  # combined, with the means and standard deviations for the accelerometer data is reported 
+  # in a dataframe on a per-subject and per-activity basis.
+  
+  # Need dplyr
+  library(dplyr)
   
   # Read the feature names and find out how many there are
-  feature_names <- read.csv('./r_data/assignment4/UCI HAR Dataset/features.txt', header=FALSE, sep=' ')[,2]
+  feature_names <- read.csv('./r_data/r_class/assignment4/UCI HAR Dataset/features.txt', header=FALSE, sep=' ')[,2]
   num_features <- length(feature_names)
   
   # Hardcode the paths cause I'm lazy
-  xpaths <- c('./r_data/assignment4/UCI HAR Dataset/test/X_test.txt',
-             './r_data/assignment4/UCI HAR Dataset/train/X_train.txt')
+  xpaths <- c('./r_data/r_class/assignment4/UCI HAR Dataset/test/X_test.txt',
+             './r_data/r_class/assignment4/UCI HAR Dataset/train/X_train.txt')
   
-  ypaths <- c('./r_data/assignment4/UCI HAR Dataset/test/y_test.txt',
-              './r_data/assignment4/UCI HAR Dataset/train/y_train.txt')
+  ypaths <- c('./r_data/r_class/assignment4/UCI HAR Dataset/test/y_test.txt',
+              './r_data/r_class/assignment4/UCI HAR Dataset/train/y_train.txt')
   
-  spaths <- c('./r_data/assignment4/UCI HAR Dataset/test/subject_test.txt',
-              './r_data/assignment4/UCI HAR Dataset/train/subject_train.txt')
+  spaths <- c('./r_data/r_class/assignment4/UCI HAR Dataset/test/subject_test.txt',
+              './r_data/r_class/assignment4/UCI HAR Dataset/train/subject_train.txt')
   
   # Make a holding matrix to dump values into, then dump values into it
   xmat <- matrix(nrow=0, ncol=(num_features)) 
@@ -40,9 +46,14 @@ run_analysis <- function(){
   colnames(all_df) <- c('subject', 'activity_type', feature_names[ms_cols])
   
   # Get activity names and rename the column in the dataframe
-  anames <- read.csv('./r_data/assignment4/UCI HAR Dataset/activity_labels.txt', sep = ' ')[,2]
+  anames <- read.csv('./r_data/r_class/assignment4/UCI HAR Dataset/activity_labels.txt', sep = ' ', header = FALSE)[,2]
   all_df$activity_type <- anames[all_df$activity_type]
   
-  return(all_df)
+  # Now the averages of each column within the grouping of subject, activity needs to be calculated.
+  averaged <- all_df %>% group_by(subject, activity_type) %>% summarise_all(mean)
+  
+  write.csv(averaged, file='./r_data/r_class/assignment4/tidy_dataset.csv')
+  
+  return(averaged)
   
 }
